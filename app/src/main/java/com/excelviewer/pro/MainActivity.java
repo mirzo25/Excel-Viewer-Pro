@@ -1,40 +1,99 @@
-package com.excelviewer.pro;
+for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            final int index = i;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.Gravity;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.graphics.Color;
+            Button button = new Button(this);
+            button.setText(workbook.getSheetName(i));
 
-public class MainActivity extends Activity {
+            button.setOnClickListener(v -> showSheet(index));
+
+            sheetBar.addView(button);
+        }
+    }
+
+    private void showSheet(int index) {
+        if (workbook == null) return;
+
+        currentSheet = index;
+        Sheet sheet = workbook.getSheetAt(index);
+
+        StringBuilder result = new StringBuilder();
+
+        result.append("Лист: ")
+                .append(sheet.getSheetName())
+                .append("\n\n");
+
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                result.append(formatter.formatCellValue(cell))
+                        .append("    ");
+            }
+            result.append("\n");
+        }
+
+        content.setText(result.toString());
+    }
+
+    private void searchExcel() {
+        if (workbook == null) {
+            content.setText("Сначала откройте Excel-файл.");
+            return;
+        }
+
+        String query = searchBox.getText().toString()
+                .trim().toLowerCase(Locale.ROOT);
+
+        if (query.isEmpty()) {
+            content.setText("Введите название товара или код.");
+            return;
+        }
+
+        StringBuilder result = new StringBuilder();
+        int count = 0;
+
+        for (int s = 0; s < workbook.getNumberOfSheets(); s++) {
+            Sheet sheet = workbook.getSheetAt(s);
+
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    String value = formatter.formatCellValue(cell);
+
+                    if (value.toLowerCase(Locale.ROOT).contains(query)) {
+                        result.append("Лист: ")
+                                .append(sheet.getSheetName())
+                                .append("\nСтрока: ")
+                                .append(row.getRowNum() + 1)
+                                .append("\n")
+                                .append(value)
+                                .append("\n\n");
+
+                        count++;
+
+                        if (count >= 500) break;
+                    }
+                }
+                if (count >= 500) break;
+            }
+            if (count >= 500) break;
+        }
+
+        if (count == 0) {
+            result.append("Ничего не найдено.");
+        } else {
+            result.insert(0, "Найдено совпадений: " + count + "\n\n");
+        }
+
+        content.setText(result.toString());
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onDestroy() {
+        super.onDestroy();
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER);
-        layout.setPadding(30, 30, 30, 30);
-        layout.setBackgroundColor(Color.WHITE);
-
-        TextView title = new TextView(this);
-        title.setText("Excel Viewer Pro");
-        title.setTextSize(28);
-        title.setTextColor(Color.BLACK);
-        title.setGravity(Gravity.CENTER);
-
-        TextView message = new TextView(this);
-        message.setText("Поиск по Excel-файлам\nXLS и XLSX");
-        message.setTextSize(18);
-        message.setTextColor(Color.DKGRAY);
-        message.setGravity(Gravity.CENTER);
-        message.setPadding(0, 30, 0, 0);
-
-        layout.addView(title);
-        layout.addView(message);
-
-        setContentView(layout);
+        try {
+            if (workbook != null) {
+                workbook.close();
+            }
+        } catch (Exception ignored) {
+        }
     }
 }
