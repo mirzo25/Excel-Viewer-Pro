@@ -7,7 +7,6 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -17,6 +16,7 @@ dependencyResolutionManagement {
 
 rootProject.name = 'Excel-Viewer-Pro'
 include ':app'
+
 jitpack (https://jitpack.io/)
 JitPack | Publish JVM and Android libraries
 JitPack makes it easy to release your Java or Android library. Publish straight from GitHub or Bitbucket.
