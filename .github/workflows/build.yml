@@ -1,6 +1,6 @@
 name: Build Excel Viewer Pro
 
-'on':
+'ON':
   workflow_dispatch:
 
 permissions:
