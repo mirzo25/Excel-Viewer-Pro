@@ -1,11 +1,8 @@
 for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             final int index = i;
-
             Button button = new Button(this);
             button.setText(workbook.getSheetName(i));
-
             button.setOnClickListener(v -> showSheet(index));
-
             sheetBar.addView(button);
         }
     }
@@ -13,9 +10,7 @@ for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
     private void showSheet(int index) {
         if (workbook == null) return;
 
-        currentSheet = index;
         Sheet sheet = workbook.getSheetAt(index);
-
         StringBuilder result = new StringBuilder();
 
         result.append("Лист: ")
@@ -43,7 +38,7 @@ for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 .trim().toLowerCase(Locale.ROOT);
 
         if (query.isEmpty()) {
-            content.setText("Введите название товара или код.");
+            content.setText("Введите название или код.");
             return;
         }
 
@@ -57,7 +52,9 @@ for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 for (Cell cell : row) {
                     String value = formatter.formatCellValue(cell);
 
-                    if (value.toLowerCase(Locale.ROOT).contains(query)) {
+                    if (value.toLowerCase(Locale.ROOT)
+                            .contains(query)) {
+
                         result.append("Лист: ")
                                 .append(sheet.getSheetName())
                                 .append("\nСтрока: ")
@@ -67,9 +64,9 @@ for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                                 .append("\n\n");
 
                         count++;
-
-                        if (count >= 500) break;
                     }
+
+                    if (count >= 500) break;
                 }
                 if (count >= 500) break;
             }
@@ -79,7 +76,7 @@ for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
         if (count == 0) {
             result.append("Ничего не найдено.");
         } else {
-            result.insert(0, "Найдено совпадений: " + count + "\n\n");
+            result.insert(0, "Найдено: " + count + "\n\n");
         }
 
         content.setText(result.toString());
@@ -93,7 +90,8 @@ for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             if (workbook != null) {
                 workbook.close();
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            // Игнорируем ошибку закрытия
         }
     }
 }
